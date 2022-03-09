@@ -95,7 +95,9 @@ export default class RNWebView extends Component<
   private webViewRef = createRef<WebView>();
 
   componentDidMount() {
-    this.setState({ webviewUri: calendarYearFilePath });
+    this.setState({ webviewUri: calendarYearFilePath }, () => {
+      this.updateProps();
+    });
   }
 
   private diffKeys = [

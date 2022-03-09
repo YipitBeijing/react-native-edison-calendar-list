@@ -28,16 +28,6 @@ class App extends React.Component<any, State> {
     this.state = {
       isDarkMode: false,
       year: 1900,
-      selectDay: {
-        year: 1900,
-        month: 1,
-        date: 20,
-      },
-      today: {
-        year: 1900,
-        month: 1,
-        date: 2,
-      },
     };
   }
 
