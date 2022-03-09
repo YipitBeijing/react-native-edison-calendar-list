@@ -68,8 +68,9 @@ class App extends React.Component<any, State> {
   private updateProps = (jsonStr: string) => {
     try {
       const json = JSON.parse(jsonStr) as WebProps;
-      this.postMessage(EventName.Debugger, jsonStr);
-      this.setState(json);
+      this.setState(json, () => {
+        this.postMessage(EventName.Render, true);
+      });
     } catch (err: any) {
       this.postMessage(EventName.Error, err.message);
     }

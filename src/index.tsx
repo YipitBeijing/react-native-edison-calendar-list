@@ -1,6 +1,5 @@
-import { Buffer } from "buffer";
 import React, { Component, createRef } from "react";
-import { Platform } from "react-native";
+import { Platform, View } from "react-native";
 import RNFS from "react-native-fs";
 import WebView, {
   WebViewMessageEvent,
@@ -72,11 +71,13 @@ type WithoutProps =
 type EdisonWebViewProps = WebProps &
   Omit<WebViewProps, WithoutProps> & {
     onSelectMonth?: (year: number, month: number) => void;
+    onHeightChange?: (height: number, columnCount: number) => void;
   };
 
 type EdisonWebViewState = {
   webviewUri: string;
   height: number;
+  opacity: number;
 };
 export default class RNWebView extends Component<
   EdisonWebViewProps,
@@ -84,11 +85,14 @@ export default class RNWebView extends Component<
 > {
   timeoutMap: Map<string, NodeJS.Timeout> = new Map();
   webviewMounted: boolean = false;
+  viewWidth: number = 0;
+
   constructor(props: any) {
     super(props);
     this.state = {
       webviewUri: "",
       height: 500,
+      opacity: 1,
     };
   }
 
@@ -169,8 +173,12 @@ export default class RNWebView extends Component<
       } = JSON.parse(event.nativeEvent.data);
       if (messageData.type === EventName.IsMounted) {
         this.webviewMounted = true;
+      } else if (messageData.type === EventName.Render) {
+        this.setState({ opacity: 0 });
       } else if (messageData.type === EventName.HeightChange) {
         this.setState({ height: messageData.data });
+        this.props.onHeightChange &&
+          this.props.onHeightChange(messageData.data, this.calcColumnCount());
       } else if (messageData.type === EventName.SelectMonth) {
         this.props.onSelectMonth &&
           this.props.onSelectMonth(
@@ -185,24 +193,68 @@ export default class RNWebView extends Component<
 
   render() {
     return (
-      <WebView
-        {...this.props}
+      <View
         style={[
-          this.props.style,
           {
             width: "100%",
             height: this.state.height,
             overflow: "hidden",
           },
         ]}
-        ref={this.webViewRef}
-        originWhitelist={["*"]}
-        source={{ uri: this.state.webviewUri }}
-        allowFileAccess
-        forceDarkOn={this.props.isDarkMode}
-        allowingReadAccessToURL={"file://"}
-        onMessage={this.onMessage}
-      />
+        onLayout={(e) => {
+          this.viewWidth = e.nativeEvent.layout.width;
+        }}
+      >
+        <WebView
+          {...this.props}
+          style={[
+            this.props.style,
+            {
+              width: "100%",
+              height: this.state.height,
+              overflow: "hidden",
+            },
+          ]}
+          ref={this.webViewRef}
+          originWhitelist={["*"]}
+          source={{ uri: this.state.webviewUri }}
+          allowFileAccess
+          forceDarkOn={this.props.isDarkMode}
+          allowingReadAccessToURL={"file://"}
+          onMessage={this.onMessage}
+        />
+        <View
+          style={{
+            position: "absolute",
+            width: "100%",
+            height: "110%",
+            top: 0,
+            left: 0,
+            backgroundColor: this.props.isDarkMode ? "#121212" : "#fffffe",
+            opacity: this.state.opacity,
+          }}
+          pointerEvents={"none"}
+        />
+      </View>
     );
   }
+
+  private calcColumnCount = () => {
+    if (!this.viewWidth) {
+      return 2;
+    }
+    if (this.viewWidth < 300) {
+      return 1;
+    }
+    if (this.viewWidth >= 300 && this.viewWidth < 822) {
+      return 2;
+    }
+    if (this.viewWidth < 1092 && this.viewWidth >= 822) {
+      return 3;
+    }
+    if (this.viewWidth < 1092 && this.viewWidth >= 822) {
+      return 3;
+    }
+    return 4;
+  };
 }

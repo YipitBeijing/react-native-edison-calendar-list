@@ -3,6 +3,7 @@ export const EventName = {
   HeightChange: "heightChange",
   SelectMonth: "selectMonth",
   Debugger: "debugger",
+  Render: "render",
   Error: "error",
 } as const;
 
