@@ -36,7 +36,7 @@ const weekTitleTemplate = ({
   color,
   activeColor,
 }: {
-  selected?: number;
+  selected: number;
   fontFamily: string;
   color: string;
   activeColor: string;
@@ -69,42 +69,45 @@ const selectDay = ({
   }
   const xPoint = 11.5 + selectDayPoint.x * 23;
   const yPoint = 65 + selectDayPoint.y * 22;
+  const xPointForRect = xPoint - 12;
+  const yPointForRect = yPoint - 16;
+  const dayText = selectDayPoint.day;
   return `
-  <rect x="${xPoint - 12}" y="${
-    yPoint - 12 - 4
-  }" width="24" height="24" fill="${color}" />
-  <text font-family="${fontFamily}" font-size="12" x="${xPoint}" y="${yPoint}" fill="#ffffff" style="text-anchor:middle;">${
-    selectDayPoint.day
-  }</text>`;
+  <rect x="${xPointForRect}" y="${yPointForRect}" width="24" height="24" fill="${color}" />
+  <text font-family="${fontFamily}" font-size="12" x="${xPoint}" y="${yPoint}" fill="#ffffff" style="text-anchor:middle;">${dayText}</text>
+  <circle cx="${xPoint}" cy="${yPoint + 4}" r="1" fill="#ffffff"
+  `;
 };
 
 const svgTemplate = ({
   daysText,
   monthText,
+  selectWeek,
   selectDayPoint,
   fontFamily,
+  selectedTextColor,
   monthTitleColor,
   weekTitleColor,
-  selectedWeekTitleColor,
 }: {
   daysText: string;
   monthText: string;
+  selectWeek: number;
   selectDayPoint: { x: number; y: number; day: number } | null;
   fontFamily: string;
+  selectedTextColor: string;
   monthTitleColor: string;
   weekTitleColor: string;
-  selectedWeekTitleColor: string;
 }) => `
 <svg width="161" height="180" viewBox="0 0 161 180">
   ${monthTitleTemplate({ monthText, fontFamily, color: monthTitleColor })}
   ${weekTitleTemplate({
-    selected: selectDayPoint?.x,
+    selected: selectWeek,
     fontFamily,
     color: weekTitleColor,
-    activeColor: selectedWeekTitleColor,
+    activeColor: selectedTextColor,
   })}
   ${daysText}
-  ${selectDay({ color: selectedWeekTitleColor, fontFamily, selectDayPoint })}
+  ${selectDay({ color: selectedTextColor, fontFamily, selectDayPoint })}
 </svg>`;
 
 const Month31Day = [0, 2, 4, 6, 7, 9, 11];
@@ -166,30 +169,33 @@ type GenerateSvgParams = {
   year: number;
   month: number;
   selectDay?: number;
+  today?: number;
   fontFamily?: string;
+  selectedTextColor?: string;
   activeTextColor?: string;
   inactiveTextColor?: string;
   monthTitleColor?: string;
   weekTitleColor?: string;
-  selectedWeekTitleColor?: string;
 };
 
 export function generateSvg({
   year,
   month,
   selectDay,
+  today,
   fontFamily = "",
   activeTextColor = "#000001",
   inactiveTextColor = "#a3a3a3",
   monthTitleColor = "#000000",
   weekTitleColor = "#999999",
-  selectedWeekTitleColor = "#136aee",
+  selectedTextColor = "#136aee",
 }: GenerateSvgParams) {
   const preMonthDays = getShowPreMonthDays(year, month);
   const preMonthDayCount = preMonthDays.length;
   const thisMonthDayCount = getMonthDayCount(year, month);
   let str = "";
   let selectDayPoint: { x: number; y: number; day: number } | null = null;
+  let selectWeek: number = -1;
 
   for (let i = 0; i < 42; i++) {
     const x = i % 7;
@@ -206,15 +212,18 @@ export function generateSvg({
       i >= preMonthDayCount &&
       i < preMonthDayCount + thisMonthDayCount
     ) {
-      const today = i - preMonthDayCount + 1;
-      if (selectDay === today) {
-        selectDayPoint = { x, y, day: today };
+      const thisday = i - preMonthDayCount + 1;
+      if (selectDay === thisday) {
+        selectDayPoint = { x, y, day: thisday };
+      }
+      if (today === thisday) {
+        selectWeek = x;
       }
       str += singleDayTemplate({
         x,
         y,
-        day: today,
-        color: activeTextColor,
+        day: thisday,
+        color: today === thisday ? selectedTextColor : activeTextColor,
         fontFamily,
       });
     } else {
@@ -230,10 +239,11 @@ export function generateSvg({
   return svgTemplate({
     daysText: str,
     monthText: MonthName[month],
+    selectWeek,
     selectDayPoint,
     fontFamily,
+    selectedTextColor,
     monthTitleColor,
     weekTitleColor,
-    selectedWeekTitleColor,
   });
 }

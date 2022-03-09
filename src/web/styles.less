@@ -41,8 +41,18 @@ body {
     padding-top: 30px;
     overflow: hidden;
     margin: 0 10px;
+    position: relative;
+
+    :active {
+      filter: opacity(20%);
+    }
 
     svg {
+      * {
+        pointer-events: none;
+      }
+      user-select: none;
+      -webkit-user-select: none;
       transform-origin: 0% 0%;
     }
   }

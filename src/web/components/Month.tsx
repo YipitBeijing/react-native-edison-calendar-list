@@ -4,35 +4,38 @@ import { WebProps } from "../../constants";
 
 type Props = WebProps & {
   month: number;
+  onSelectMonth: (year: number, month: number) => void;
 };
 
 export const MonthCalendar: FunctionComponent<Props> = ({
   year,
   month,
   selectDay,
-  monthDaysColor,
-  otherMonthDaysColor,
-  monthTitleColor,
-  weekTitleColor,
-  selectedWeekTitleColor,
+  today,
+  onSelectMonth,
+  ...otherProps
 }: Props) => {
   const selectedDate =
     selectDay?.year === year && selectDay?.month === month
       ? selectDay?.date
       : undefined;
+  const todayDate =
+    today?.year === year && today?.month === month ? today?.date : undefined;
   const svgString = generateSvg({
+    ...otherProps,
     year,
     month,
     selectDay: selectedDate,
-    fontFamily: "Helvetica Neue",
-    activeTextColor: monthDaysColor,
-    inactiveTextColor: otherMonthDaysColor,
-    monthTitleColor: monthTitleColor,
-    weekTitleColor: weekTitleColor,
-    selectedWeekTitleColor: selectedWeekTitleColor,
+    today: todayDate,
   });
   return (
-    <div className="monthBox" dangerouslySetInnerHTML={{ __html: svgString }} />
+    <div
+      className="monthBox"
+      dangerouslySetInnerHTML={{ __html: svgString }}
+      onClick={() => {
+        onSelectMonth(year, month);
+      }}
+    />
   );
 };
 

@@ -28,6 +28,16 @@ class App extends React.Component<any, State> {
     this.state = {
       isDarkMode: false,
       year: 1900,
+      selectDay: {
+        year: 1900,
+        month: 1,
+        date: 20,
+      },
+      today: {
+        year: 1900,
+        month: 1,
+        date: 2,
+      },
     };
   }
 
@@ -75,13 +85,21 @@ class App extends React.Component<any, State> {
     }
   };
 
+  private onSelectMonth = (year: number, month: number) => {
+    this.postMessage(EventName.SelectMonth, { year, month });
+  };
+
   render() {
     const { isDarkMode, year, ...otherState } = this.state;
 
     return (
       <>
         <style>{isDarkMode ? darkModeStyle : lightModeStyle}</style>
-        <YearCalendar year={year} {...otherState} />
+        <YearCalendar
+          year={year}
+          {...otherState}
+          onSelectMonth={this.onSelectMonth}
+        />
       </>
     );
   }

@@ -69,7 +69,10 @@ type WithoutProps =
   | "source"
   | "allowingReadAccessToURL"
   | "onMessage";
-type EdisonWebViewProps = WebProps & Omit<WebViewProps, WithoutProps>;
+type EdisonWebViewProps = WebProps &
+  Omit<WebViewProps, WithoutProps> & {
+    onSelectMonth?: (year: number, month: number) => void;
+  };
 
 type EdisonWebViewState = {
   webviewUri: string;
@@ -95,32 +98,37 @@ export default class RNWebView extends Component<
     this.setState({ webviewUri: calendarYearFilePath });
   }
 
+  private diffKeys = [
+    "year",
+    "isDarkMode",
+    "selectDay",
+    "today",
+    "fontFamily",
+    "selectedTextColor",
+    "activeTextColor",
+    "inactiveTextColor",
+    "monthTitleColor",
+    "weekTitleColor",
+  ] as const;
+
   componentDidUpdate(prevProps: EdisonWebViewProps) {
-    if (
-      prevProps.isDarkMode !== this.props.isDarkMode ||
-      prevProps.year !== this.props.year ||
-      prevProps.selectDay !== this.props.selectDay ||
-      prevProps.monthDaysColor !== this.props.monthDaysColor ||
-      prevProps.otherMonthDaysColor !== this.props.otherMonthDaysColor ||
-      prevProps.monthTitleColor !== this.props.monthTitleColor ||
-      prevProps.weekTitleColor !== this.props.weekTitleColor ||
-      prevProps.selectedWeekTitleColor !== this.props.selectedWeekTitleColor
-    ) {
+    let flag = false;
+    for (const key of this.diffKeys) {
+      if (prevProps[key] !== this.props[key]) {
+        flag = true;
+        break;
+      }
+    }
+    if (flag) {
       this.updateProps();
     }
   }
 
   private updateProps = () => {
-    const newJson: WebProps = {
-      year: this.props.year,
-      isDarkMode: this.props.isDarkMode,
-      selectDay: this.props.selectDay,
-      monthDaysColor: this.props.monthDaysColor,
-      otherMonthDaysColor: this.props.otherMonthDaysColor,
-      monthTitleColor: this.props.monthTitleColor,
-      weekTitleColor: this.props.weekTitleColor,
-      selectedWeekTitleColor: this.props.selectedWeekTitleColor,
-    };
+    const newJson: any = {};
+    for (const key of this.diffKeys) {
+      newJson[key] = this.props[key];
+    }
     this.executeScript(InjectScriptName.UpdateProps, JSON.stringify(newJson));
   };
 
@@ -161,6 +169,12 @@ export default class RNWebView extends Component<
         this.webviewMounted = true;
       } else if (messageData.type === EventName.HeightChange) {
         this.setState({ height: messageData.data });
+      } else if (messageData.type === EventName.SelectMonth) {
+        this.props.onSelectMonth &&
+          this.props.onSelectMonth(
+            messageData.data.year,
+            messageData.data.month
+          );
       }
     } catch (err) {
       // pass
