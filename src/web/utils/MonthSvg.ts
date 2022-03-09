@@ -73,7 +73,13 @@ const selectDay = ({
   const yPointForRect = yPoint - 16;
   const dayText = selectDayPoint.day;
   return `
-  <rect x="${xPointForRect}" y="${yPointForRect}" width="24" height="24" fill="${color}" />
+  <filter id="dropShadow" x="-50%" y="-50%" width="200%" height="200%">
+    <feOffset result="offOut" in="SourceGraphic" dx="0" dy="4" />
+    <feColorMatrix result="matrixOut" in="offOut" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.16 0" />
+    <feGaussianBlur result="blurOut" in="matrixOut" stdDeviation="8" />
+    <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
+  </filter>
+  <rect x="${xPointForRect}" y="${yPointForRect}" width="24" height="24" fill="${color}" filter="url(#dropShadow)"/>
   <text font-family="${fontFamily}" font-size="12" x="${xPoint}" y="${yPoint}" fill="#ffffff" style="text-anchor:middle;">${dayText}</text>
   <circle cx="${xPoint}" cy="${yPoint + 4}" r="1" fill="#ffffff"
   `;
