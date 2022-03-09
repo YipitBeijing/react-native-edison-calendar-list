@@ -43,14 +43,12 @@ body {
     margin: 0 10px;
     position: relative;
 
-    :active {
+    &:active {
       filter: opacity(20%);
     }
 
     svg {
-      * {
-        pointer-events: none;
-      }
+      pointer-events: none;
       user-select: none;
       -webkit-user-select: none;
       transform-origin: 0% 0%;
