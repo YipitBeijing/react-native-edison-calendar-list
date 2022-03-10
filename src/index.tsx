@@ -106,7 +106,7 @@ export default class RNWebView extends Component<
 
   private diffKeys = [
     "year",
-    "isDarkMode",
+    "backgroundColor",
     "selectDay",
     "today",
     "fontFamily",
@@ -176,9 +176,10 @@ export default class RNWebView extends Component<
       } else if (messageData.type === EventName.Render) {
         this.setState({ opacity: 0 });
       } else if (messageData.type === EventName.HeightChange) {
-        this.setState({ height: messageData.data });
+        const { height, columnCount } = messageData.data;
+        this.setState({ height });
         this.props.onHeightChange &&
-          this.props.onHeightChange(messageData.data, this.calcColumnCount());
+          this.props.onHeightChange(height, columnCount);
       } else if (messageData.type === EventName.SelectMonth) {
         this.props.onSelectMonth &&
           this.props.onSelectMonth(
@@ -199,6 +200,7 @@ export default class RNWebView extends Component<
             width: "100%",
             height: this.state.height,
             overflow: "hidden",
+            backgroundColor: this.props.backgroundColor,
           },
         ]}
         onLayout={(e) => {
@@ -213,13 +215,16 @@ export default class RNWebView extends Component<
               width: "100%",
               height: this.state.height,
               overflow: "hidden",
+              backgroundColor: this.props.backgroundColor,
             },
           ]}
+          containerStyle={{
+            backgroundColor: this.props.backgroundColor,
+          }}
           ref={this.webViewRef}
           originWhitelist={["*"]}
           source={{ uri: this.state.webviewUri }}
           allowFileAccess
-          forceDarkOn={this.props.isDarkMode}
           allowingReadAccessToURL={"file://"}
           onMessage={this.onMessage}
         />
@@ -230,7 +235,7 @@ export default class RNWebView extends Component<
             height: "110%",
             top: 0,
             left: 0,
-            backgroundColor: this.props.isDarkMode ? "#121212" : "#fffffe",
+            backgroundColor: this.props.backgroundColor,
             opacity: this.state.opacity,
           }}
           pointerEvents={"none"}
@@ -238,23 +243,4 @@ export default class RNWebView extends Component<
       </View>
     );
   }
-
-  private calcColumnCount = () => {
-    if (!this.viewWidth) {
-      return 2;
-    }
-    if (this.viewWidth < 300) {
-      return 1;
-    }
-    if (this.viewWidth >= 300 && this.viewWidth < 822) {
-      return 2;
-    }
-    if (this.viewWidth < 1092 && this.viewWidth >= 822) {
-      return 3;
-    }
-    if (this.viewWidth < 1092 && this.viewWidth >= 822) {
-      return 3;
-    }
-    return 4;
-  };
 }

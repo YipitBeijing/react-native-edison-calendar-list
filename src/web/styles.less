@@ -33,15 +33,13 @@ body {
   .yearBox {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: space-around;
     padding: 0 6px;
   }
 
   .monthBox {
-    padding-top: 30px;
+    margin-top: 30px;
     overflow: hidden;
-    margin: 0 10px;
-    position: relative;
 
     &:active {
       filter: opacity(20%);
@@ -52,59 +50,6 @@ body {
       user-select: none;
       -webkit-user-select: none;
       transform-origin: 0% 0%;
-    }
-  }
-}
-
-@media screen and (min-width: 300px) and (max-width: 375px) {
-  #edo-container .monthBox {
-    width: 124px;
-    height: 139px;
-    svg {
-      transform: scale(0.77);
-    }
-  }
-}
-
-@media screen and (min-width: 375px) and (max-width: 475px) {
-  #edo-container .monthBox {
-    width: 161px;
-    height: 180px;
-    svg {
-      transform: none;
-    }
-  }
-}
-
-@media screen and (min-width: 475px) and (max-width: 575px) {
-  #edo-container .monthBox {
-    width: 205px;
-    height: 229px;
-    svg {
-      transform: scale(1.27);
-    }
-  }
-}
-
-@media screen and (min-width: 575px) and (max-width: 1250px) {
-  #edo-container .monthBox {
-    width: 250px;
-    height: 280px;
-    svg {
-      transform: scale(1.55);
-    }
-  }
-}
-
-@media screen and (min-width: 1250px) {
-  #edo-container .monthBox {
-    width: 20%;
-    height: 280px;
-    display: flex;
-    justify-content: center;
-    svg {
-      transform: scale(1.55);
-      transform-origin: 50% 0%;
     }
   }
 }

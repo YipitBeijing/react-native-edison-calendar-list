@@ -1,6 +1,6 @@
 {
   "name": "react-native-edison-calendar-list",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "calendar list",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

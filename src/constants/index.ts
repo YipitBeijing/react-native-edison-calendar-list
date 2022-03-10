@@ -9,7 +9,7 @@ export const EventName = {
 
 export type WebProps = {
   year: number;
-  isDarkMode?: boolean;
+  backgroundColor?: string;
   selectDay?: {
     year: number;
     month: number;

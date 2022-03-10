@@ -1,3 +1,6 @@
+export const SvgWidth = 161;
+export const SvgHeight = 180;
+
 const singleDayTemplate = ({
   x,
   y,
@@ -104,7 +107,7 @@ const svgTemplate = ({
   monthTitleColor: string;
   weekTitleColor: string;
 }) => `
-<svg width="161" height="180" viewBox="0 0 161 180">
+<svg width="${SvgWidth}" height="${SvgHeight}" viewBox="0 0 ${SvgWidth} ${SvgHeight}">
   ${monthTitleTemplate({ monthText, fontFamily, color: monthTitleColor })}
   ${weekTitleTemplate({
     selected: selectWeek,
