@@ -5,6 +5,7 @@ import { SvgWidth, SvgHeight } from "./utils/MonthSvg";
 import "./styles";
 
 const monthPaddingHorizontal = 10;
+const monthMarginTop = 30;
 
 type State = WebProps & {
   scale: number;
@@ -38,14 +39,10 @@ class App extends React.Component<any, State> {
     if (info) {
       this.postMessage(EventName.Debugger, info);
     }
-    const container = document.getElementById("edo-container");
-    if (!container) {
-      return;
-    }
-    this.updateLayout(container.scrollWidth, container.scrollHeight);
+    this.updateLayout(document.body.offsetWidth);
   };
 
-  private updateLayout = (width: number, height: number) => {
+  private updateLayout = (width: number) => {
     let columnCount = 2;
     if (width < 300) {
       columnCount = 1;
@@ -62,7 +59,11 @@ class App extends React.Component<any, State> {
         (monthCalcWidth / (SvgWidth + monthPaddingHorizontal * 2)) * 100
       ) / 100;
     this.setState({ scale, columnCount });
-    this.postMessage(EventName.HeightChange, { height, columnCount });
+    const monthHeight = SvgHeight * scale + monthMarginTop;
+    this.postMessage(EventName.HeightChange, {
+      height: (monthHeight * 12) / columnCount,
+      columnCount,
+    });
   };
 
   private postMessage = (type: EventType, data: any) => {

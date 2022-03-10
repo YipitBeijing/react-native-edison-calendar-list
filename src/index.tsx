@@ -85,7 +85,6 @@ export default class RNWebView extends Component<
 > {
   timeoutMap: Map<string, NodeJS.Timeout> = new Map();
   webviewMounted: boolean = false;
-  viewWidth: number = 0;
 
   constructor(props: any) {
     super(props);
@@ -203,9 +202,6 @@ export default class RNWebView extends Component<
             backgroundColor: this.props.backgroundColor,
           },
         ]}
-        onLayout={(e) => {
-          this.viewWidth = e.nativeEvent.layout.width;
-        }}
       >
         <WebView
           {...this.props}
